@@ -1,16 +1,20 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/vec4.hpp>
+#include <iostream>
 
 int main(void)
 {
     GLFWwindow* window;
 
     if (!glfwInit())
+    {
+        std::cerr << "Couldn't initialize glfw\n";
         return -1;
+    }
 
     window = glfwCreateWindow(1280, 720, "Minecraft", NULL, NULL);
-    auto bg_color = glm::vec4(0.5f, 0.8f, 0.9f, 1.f);
+
     if (!window)
     {
         glfwTerminate();
@@ -18,6 +22,17 @@ int main(void)
     }
 
     glfwMakeContextCurrent(window);
+
+    auto err = glewInit();
+    if (err != GLEW_OK)
+    {
+        std::cerr << "Error:" << glewGetErrorString(err) << "\n";
+        glfwTerminate();
+        return -1;
+    }
+
+    auto bg_color = glm::vec4(0.5f, 0.8f, 0.9f, 1.f);
+
     glClearColor(bg_color.r, bg_color.g, bg_color.b, bg_color.a);
 
     while (!glfwWindowShouldClose(window))
