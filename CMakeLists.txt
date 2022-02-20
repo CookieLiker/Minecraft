@@ -10,6 +10,9 @@ find_package(glm CONFIG REQUIRED)
 add_executable(
     ${PROJECT_NAME}
     src/main.cpp
+    src/GLObject.cpp
+    src/Shader.cpp
+    src/ShaderProgram.cpp
 )
 
 target_include_directories(

@@ -3,12 +3,17 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+#include "Shader.h"
+#include "ShaderProgram.h"
+
 #include <array>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
 std::string load_text(const std::string& path);
+
+using namespace Minecraft;
 
 int main(void)
 {
@@ -51,50 +56,16 @@ int main(void)
     auto vs_source = load_text("../res/shaders/shader.vs");
     auto fs_source = load_text("../res/shaders/shader.fs");
 
-    auto vs = glCreateShader(GL_VERTEX_SHADER);
-    auto fs = glCreateShader(GL_FRAGMENT_SHADER);
+    auto vs = Shader(vs_source, GL_VERTEX_SHADER);
+    auto fs = Shader(fs_source, GL_FRAGMENT_SHADER);
 
-    const char* vs_src = vs_source.c_str();
-    const char* fs_src = fs_source.c_str();
-    glShaderSource(vs, 1, &vs_src, 0);
-    glShaderSource(fs, 1, &fs_src, 0);
+    vs.compile();
+    fs.compile();
 
-    int success = 0;
-    char infoLog[512];
-
-    glCompileShader(vs);
-    glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
-
-    if (success == GL_FALSE)
-    {
-        glGetShaderInfoLog(vs, 512, NULL, infoLog);
-        std::cerr << "Failed to compile vs shader, error: " << infoLog << "\n";
-    }
-
-    glCompileShader(fs);
-    glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
-
-    if (success == GL_FALSE)
-    {
-        glGetShaderInfoLog(fs, 512, NULL, infoLog);
-        std::cerr << "error: " << infoLog << "\n";
-    }
-
-    auto shader_program = glCreateProgram();
-    glAttachShader(shader_program, vs);
-    glAttachShader(shader_program, fs);
-    glLinkProgram(shader_program);
-
-    glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
-
-    if (success == GL_FALSE)
-    {
-        glGetProgramInfoLog(shader_program, 512, NULL, infoLog);
-        std::cerr << "error: " << infoLog << "\n";
-    }
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
+    auto shader_program = ShaderProgram();
+    shader_program.attach_shader(vs);
+    shader_program.attach_shader(fs);
+    shader_program.link();
 
     GLuint vao, vbo;
     glGenVertexArrays(1, &vao);
@@ -113,7 +84,7 @@ int main(void)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(shader_program);
+        shader_program.use();
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
         glfwSwapBuffers(window);
