@@ -13,6 +13,7 @@ add_executable(
     src/GLObject.cpp
     src/Shader.cpp
     src/ShaderProgram.cpp
+    src/BO.cpp
 )
 
 target_include_directories(

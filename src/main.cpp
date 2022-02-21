@@ -3,6 +3,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+#include "BO.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
 
@@ -47,11 +48,14 @@ int main(void)
 
     glClearColor(bg_color.r, bg_color.g, bg_color.b, bg_color.a);
 
-    std::array<glm::vec3, 3> vertices = {
-        glm::vec3{-0.5f, -0.5f, 0.0f},
-        glm::vec3{0.0f, +0.5f, 0.0f},
+    std::array<glm::vec3, 4> vertices = {
+        glm::vec3{-0.5f, +0.5f, 0.0f},
+        glm::vec3{+0.5f, +0.5f, 0.0f},
         glm::vec3{+0.5f, -0.5f, 0.0f},
+        glm::vec3{-0.5f, -0.5f, 0.0f},
     };
+
+    std::array<unsigned int, 6> indices = {0, 2, 3, 0, 1, 2};
 
     auto vs_source = load_text("../res/shaders/shader.vs");
     auto fs_source = load_text("../res/shaders/shader.fs");
@@ -67,15 +71,16 @@ int main(void)
     shader_program.attach_shader(fs);
     shader_program.link();
 
-    GLuint vao, vbo;
+    GLuint vao;
     glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
+    auto vbo = BO(GL_ARRAY_BUFFER);
+    auto ebo = BO(GL_ELEMENT_ARRAY_BUFFER);
 
     glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     auto usage = GL_STATIC_DRAW;
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), (void*)&vertices, usage);
+    vbo.set_data(vertices, usage);
+    ebo.set_data(indices, usage);
 
     glVertexAttribPointer(0, vertices.size(), GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
     glEnableVertexAttribArray(0);
@@ -85,7 +90,7 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader_program.use();
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (void*)0);
 
         glfwSwapBuffers(window);
 
