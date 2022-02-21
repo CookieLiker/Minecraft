@@ -14,6 +14,7 @@ add_executable(
     src/Shader.cpp
     src/ShaderProgram.cpp
     src/BO.cpp
+    src/VAO.cpp
 )
 
 target_include_directories(

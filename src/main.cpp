@@ -6,6 +6,7 @@
 #include "BO.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
+#include "VAO.h"
 
 #include <array>
 #include <fstream>
@@ -71,19 +72,17 @@ int main(void)
     shader_program.attach_shader(fs);
     shader_program.link();
 
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
+    auto vao = VAO();
     auto vbo = BO(GL_ARRAY_BUFFER);
     auto ebo = BO(GL_ELEMENT_ARRAY_BUFFER);
-
-    glBindVertexArray(vao);
-
     auto usage = GL_STATIC_DRAW;
+
+    vao.bind();
+
     vbo.set_data(vertices, usage);
     ebo.set_data(indices, usage);
 
-    glVertexAttribPointer(0, vertices.size(), GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
-    glEnableVertexAttribArray(0);
+    vao.set_attrib(0, vertices, GL_FLOAT, GL_FALSE, 0);
 
     while (!glfwWindowShouldClose(window))
     {
