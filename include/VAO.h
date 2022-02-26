@@ -1,4 +1,5 @@
 #pragma once
+#include "BO.h"
 #include "GLObject.h"
 
 #include <array>
@@ -13,11 +14,12 @@ class VAO : public GLObject
     void unbind() const;
     void destroy() override;
 
-    template <class T, size_t N>
-    void set_attrib(GLuint index, const std::array<T, N>& vertices, GLenum type, GLboolean normalized, void* offset)
+    template <class T>
+    void set_attrib(const BO& vbo, GLuint index, int size, GLenum type, GLboolean normalized, void* offset)
     {
-        glBindVertexArray(handle);
-        glVertexAttribPointer(index, vertices.size(), type, normalized, sizeof(T), (const void*)offset);
+        bind();
+        vbo.bind();
+        glVertexAttribPointer(index, size, type, normalized, sizeof(T), (const void*)offset);
         glEnableVertexAttribArray(index);
     }
 };

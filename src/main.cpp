@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "ShaderProgram.h"
 #include "VAO.h"
+#include "Vertex.h"
 
 #include <array>
 #include <fstream>
@@ -49,11 +50,12 @@ int main(void)
 
     glClearColor(bg_color.r, bg_color.g, bg_color.b, bg_color.a);
 
-    std::array<glm::vec3, 4> vertices = {
-        glm::vec3{-0.5f, +0.5f, 0.0f},
-        glm::vec3{+0.5f, +0.5f, 0.0f},
-        glm::vec3{+0.5f, -0.5f, 0.0f},
-        glm::vec3{-0.5f, -0.5f, 0.0f},
+    auto green = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+    std::array<Vertex, 4> vertices = {
+        Vertex{glm::vec3{-0.5f, +0.5f, 0.0f}, green},
+        Vertex{glm::vec3{+0.5f, +0.5f, 0.0f}, green},
+        Vertex{glm::vec3{+0.5f, -0.5f, 0.0f}, green},
+        Vertex{glm::vec3{-0.5f, -0.5f, 0.0f}, green},
     };
 
     std::array<unsigned int, 6> indices = {0, 2, 3, 0, 1, 2};
@@ -77,12 +79,11 @@ int main(void)
     auto ebo = BO(GL_ELEMENT_ARRAY_BUFFER);
     auto usage = GL_STATIC_DRAW;
 
-    vao.bind();
+    vao.set_attrib<Vertex>(vbo, 0, glm::vec3::length(), GL_FLOAT, GL_FALSE, (void*)offsetof(Vertex, position));
+    vao.set_attrib<Vertex>(vbo, 1, glm::vec4::length(), GL_FLOAT, GL_FALSE, (void*)offsetof(Vertex, color));
 
     vbo.set_data(vertices, usage);
     ebo.set_data(indices, usage);
-
-    vao.set_attrib(0, vertices, GL_FLOAT, GL_FALSE, 0);
 
     while (!glfwWindowShouldClose(window))
     {
